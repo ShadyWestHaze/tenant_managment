@@ -10,8 +10,8 @@ export default async function Home() {
     
     return (
         <>
-        <div className="text-3xl">Tailwind</div>
-              <h1 className="text-4xl text-green-500 hover:text-red-500 transition-colors">Home Page</h1>
+        
+              <h1 >Home Page</h1>
             
             {session ? (
                 <>

@@ -1,4 +1,6 @@
-import '../app/global.css';
+import React from 'react';
+import '../app/global.css'; // Ensure the path is correct
+import Navbar from '../components/navbar';
 
 export const metadata = {
   title: 'Next.js',
@@ -12,7 +14,14 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      <body>{children}</body>
+      <head>
+        <title>{metadata.title}</title>
+        <meta name="description" content={metadata.description} />
+      </head>
+      <body>
+        <Navbar />
+        {children}
+      </body>
     </html>
   );
 }
