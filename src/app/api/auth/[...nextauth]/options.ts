@@ -13,7 +13,7 @@ export const options: NextAuthOptions = {
     CredentialsProvider({
       name: "Credentials",
       credentials: {
-        username: { label: "Username:", type: "text", placeholder: "your username" },
+        email: { label: "Email:", type: "text", placeholder: "your email" },
         password: { label: "Password:", type: "password", placeholder: "your password" },
       },
       async authorize(credentials) {
@@ -22,23 +22,22 @@ export const options: NextAuthOptions = {
           return null;
         }
 
-        const { username, password } = credentials;
+        const { email, password } = credentials;
 
         try {
-          const res = await query('SELECT * FROM users WHERE username = $1', [username]);
+          const res = await query('SELECT id, name, email, password, ismanager FROM users WHERE email = $1', [email]);
           const user = res.rows[0];
 
           if (!user) {
-            console.log('No user found with that username');
+            console.log('No user found with that email');
             return null;
           }
-
 
           const passwordMatch = await bcrypt.compare(password, user.password);
 
           if (passwordMatch) {
             console.log('Password match');
-            return { id: user.id, name: user.username, email: user.email };
+            return { id: user.id, name: user.name, email: user.email, ismanager: user.ismanager };
           } else {
             console.log('Password does not match');
             return null;
@@ -51,6 +50,25 @@ export const options: NextAuthOptions = {
     }),
   ],
   secret: process.env.NEXTAUTH_SECRET,
+  callbacks: {
+    async session({ session, token }) {
+      if (token) {
+        session.user = {
+          ...session.user,
+          id: token.id as string,
+          ismanager: token.ismanager as boolean,
+        };
+      }
+      return session;
+    },
+    async jwt({ token, user }) {
+      if (user) {
+        token.id = user.id;
+        token.ismanager = user.ismanager;
+      }
+      return token;
+    },
+  },
 };
 
 export default options;
